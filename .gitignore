@@ -1,0 +1,10 @@
+# Apps Script local
+.clasp.json
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Logs
+*.log
