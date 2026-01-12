@@ -3,7 +3,6 @@
  * BOOTSTRAP DO CONTEXTO DE TRABALHO (ADMIN)
  * ============================================================
  */
-
 function ui_admin_criarContextoTrabalho() {
 
   const ui = SpreadsheetApp.getUi();
@@ -17,9 +16,8 @@ function ui_admin_criarContextoTrabalho() {
     return;
   }
 
-  // 🔎 Listar contextos existentes (informativo)
+  // 🔎 Contextos existentes (informativo)
   const contextosExistentes = admin_listarContextos_();
-
   let mensagemInfo = '';
 
   if (contextosExistentes.length > 0) {
@@ -27,21 +25,19 @@ function ui_admin_criarContextoTrabalho() {
     contextosExistentes.forEach(ctx => {
       mensagemInfo += '- ' + ctx.nome + '\n';
     });
-    mensagemInfo +=
-      '\nInforme o nome do NOVO contexto que deseja criar:';
+    mensagemInfo += '\nInforme o nome do NOVO contexto:';
   } else {
     mensagemInfo =
       'Nenhum contexto foi criado até o momento.\n\n' +
       'Informe o nome do primeiro contexto:';
   }
 
-  // 1️⃣ Solicitar nome do contexto
+  // 1️⃣ Nome do contexto
   const resp = ui.prompt(
     'Criar Contexto de Trabalho',
     mensagemInfo,
     ui.ButtonSet.OK_CANCEL
   );
-
   if (resp.getSelectedButton() !== ui.Button.OK) return;
 
   const nomeUsuario = (resp.getResponseText() || '').trim();
@@ -61,31 +57,34 @@ function ui_admin_criarContextoTrabalho() {
     return;
   }
 
-  // 3️⃣ Criar estrutura de pastas
+  // 3️⃣ Estrutura de pastas
   const raiz = obterPastaInventario_();
   if (!raiz) {
     ui.alert('Pasta "Inventario Patrimonial" não encontrada.');
     return;
   }
 
-  const planilhas = obterOuCriarSubpasta_(raiz, 'PLANILHAS');
-  const contextos = obterOuCriarSubpasta_(planilhas, 'CONTEXTOS');
-  const pastaContexto = obterOuCriarSubpasta_(contextos, nomeContexto);
+  const pastaPlanilhas = obterOuCriarSubpasta_(raiz, 'PLANILHAS');
+  const pastaContextos = obterOuCriarSubpasta_(pastaPlanilhas, 'CONTEXTOS');
+  const pastaContexto = obterOuCriarSubpasta_(pastaContextos, nomeContexto);
   const pastaCSV = obterOuCriarSubpasta_(pastaContexto, 'CSV_ORIGEM');
 
-  const unidades = obterOuCriarSubpasta_(raiz, 'UNIDADES');
-  const pastaUnidade = obterOuCriarSubpasta_(unidades, nomeContexto);
+  const pastaUnidades = obterOuCriarSubpasta_(raiz, 'UNIDADES');
+  const pastaUnidade = obterOuCriarSubpasta_(pastaUnidades, nomeContexto);
 
   // 4️⃣ Criar Planilha Cliente
   const planilhaCliente = SpreadsheetApp.create('UI ' + nomeUsuario);
   DriveApp.getFileById(planilhaCliente.getId()).moveTo(pastaUnidade);
+
+  // ✅ FORMATAÇÃO CORRETA (por ID)
+  cliente_formatarPlanilhaInterface_(planilhaCliente.getId());
 
   // 5️⃣ Planilha Operacional (atual)
   const planilhaOperacional = SpreadsheetApp.getActiveSpreadsheet();
   planilhaOperacional.rename(nomeUsuario);
   DriveApp.getFileById(planilhaOperacional.getId()).moveTo(pastaContexto);
 
-  // 6️⃣ Persistir contexto na planilha
+  // 6️⃣ Persistir contexto (ADMIN)
   PropertiesService.getDocumentProperties().setProperty(
     'ADMIN_CONTEXTO_ATIVO',
     JSON.stringify({
