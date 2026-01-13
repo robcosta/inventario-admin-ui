@@ -1,23 +1,18 @@
-/**
- * ============================================================
- * ONOPEN – PLANILHA CLIENTE
- * ============================================================
- */
-function onOpen(e) {
-
+// ============================================================
+// cliente/cliente_onopen.gs
+// ============================================================
+function onOpen_(e) {
   try {
     const props = PropertiesService.getDocumentProperties();
 
-    // Só atua se for planilha cliente formatada
     if (props.getProperty('CLIENTE_FORMATADO') !== 'true') {
       return;
     }
 
-    const contextoRaw = props.getProperty('CONTEXTO_TRABALHO');
-    if (!contextoRaw) return;
+    const raw = props.getProperty('CONTEXTO_TRABALHO');
+    if (!raw) return;
 
-    const contexto = JSON.parse(contextoRaw);
-
+    const contexto = JSON.parse(raw);
     cliente_atualizarInformacoes_(contexto);
 
   } catch (err) {
@@ -25,3 +20,4 @@ function onOpen(e) {
     Logger.log(err);
   }
 }
+

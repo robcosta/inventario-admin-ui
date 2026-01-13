@@ -3,11 +3,12 @@
  * BOOTSTRAP DO CONTEXTO DE TRABALHO (ADMIN)
  * ============================================================
  */
+
 function ui_admin_criarContextoTrabalho() {
 
   const ui = SpreadsheetApp.getUi();
 
-  // 🔒 Bloqueio imediato por estado da planilha
+  // 🔒 Bloqueio: esta planilha já tem contexto
   if (admin_planilhaTemContexto_()) {
     ui.alert(
       'Esta planilha já pertence a um contexto.\n' +
@@ -16,7 +17,7 @@ function ui_admin_criarContextoTrabalho() {
     return;
   }
 
-  // 🔎 Contextos existentes (informativo)
+  // 🔎 Listar contextos existentes (informativo)
   const contextosExistentes = admin_listarContextos_();
   let mensagemInfo = '';
 
@@ -32,7 +33,7 @@ function ui_admin_criarContextoTrabalho() {
       'Informe o nome do primeiro contexto:';
   }
 
-  // 1️⃣ Nome do contexto
+  // 1️⃣ Solicitar nome do contexto
   const resp = ui.prompt(
     'Criar Contexto de Trabalho',
     mensagemInfo,
@@ -48,7 +49,7 @@ function ui_admin_criarContextoTrabalho() {
 
   const nomeContexto = nomeUsuario.toUpperCase();
 
-  // 2️⃣ Bloqueio por nome global
+  // 2️⃣ Verificar se já existe globalmente
   if (admin_contextoComNomeExiste_(nomeContexto)) {
     ui.alert(
       'O contexto "' + nomeContexto + '" já existe.\n\n' +
@@ -57,10 +58,10 @@ function ui_admin_criarContextoTrabalho() {
     return;
   }
 
-  // 3️⃣ Estrutura de pastas
+  // 3️⃣ Criar estrutura de pastas
   const raiz = obterPastaInventario_();
   if (!raiz) {
-    ui.alert('Pasta "Inventario Patrimonial" não encontrada.');
+    ui.alert('Pasta "Inventário Patrimonial" não encontrada.');
     return;
   }
 
@@ -76,15 +77,31 @@ function ui_admin_criarContextoTrabalho() {
   const planilhaCliente = SpreadsheetApp.create('UI ' + nomeUsuario);
   DriveApp.getFileById(planilhaCliente.getId()).moveTo(pastaUnidade);
 
-  // ✅ FORMATAÇÃO CORRETA (por ID)
-  cliente_formatarPlanilhaInterface_(planilhaCliente.getId());
+  // 5️⃣ Criar objeto de contexto do CLIENTE
+  const contextoCliente = {
+    nome: nomeContexto,
+    pastaUnidadeId: pastaUnidade.getId(),
+    planilhaClienteId: planilhaCliente.getId(),
+    emailAdmin: Session.getActiveUser().getEmail()
+  };
 
-  // 5️⃣ Planilha Operacional (atual)
+  // 6️⃣ Gravar contexto na planilha CLIENTE (escopo correto)
+  SpreadsheetApp.openById(planilhaCliente.getId());
+  PropertiesService.getDocumentProperties().setProperty(
+    'CONTEXTO_TRABALHO',
+    JSON.stringify(contextoCliente)
+  );
+
+  // 7️⃣ Formatar e atualizar planilha cliente
+  cliente_formatarPlanilhaInterface_(planilhaCliente.getId());
+  cliente_atualizarInformacoes_(contextoCliente);
+
+  // 8️⃣ Planilha operacional (ADMIN)
   const planilhaOperacional = SpreadsheetApp.getActiveSpreadsheet();
   planilhaOperacional.rename(nomeUsuario);
   DriveApp.getFileById(planilhaOperacional.getId()).moveTo(pastaContexto);
 
-  // 6️⃣ Persistir contexto (ADMIN)
+  // 9️⃣ Gravar contexto no ADMIN
   PropertiesService.getDocumentProperties().setProperty(
     'ADMIN_CONTEXTO_ATIVO',
     JSON.stringify({
@@ -98,7 +115,7 @@ function ui_admin_criarContextoTrabalho() {
     })
   );
 
-  // 7️⃣ Atualizar menu
+  // 🔟 Atualizar menu ADMIN
   criarMenuAdminOperacional_();
 
   ui.alert(
@@ -106,6 +123,6 @@ function ui_admin_criarContextoTrabalho() {
     'A planilha será reaberta para garantir consistência.'
   );
 
-  // 🔄 Refresh controlado
+  // 🔄 Reabrir planilha ADMIN
   SpreadsheetApp.openById(planilhaOperacional.getId());
 }

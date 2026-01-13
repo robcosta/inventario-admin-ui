@@ -1,10 +1,16 @@
-/**
- * ============================================================
- * FORMATAÇÃO DA PLANILHA CLIENTE (BOOTSTRAP)
- * Executa UMA ÚNICA VEZ
- * ============================================================
- */
+// ============================================================
+// FORMATAÇÃO DA PLANILHA CLIENTE
+// ============================================================
+
 function cliente_formatarPlanilhaInterface_(spreadsheetId) {
+  cliente_formatarPlanilhaInterfaceInterno_(spreadsheetId, false);
+}
+
+function cliente_reformatarPlanilhaInterface_(spreadsheetId) {
+  cliente_formatarPlanilhaInterfaceInterno_(spreadsheetId, true);
+}
+
+function cliente_formatarPlanilhaInterfaceInterno_(spreadsheetId, forcar) {
 
   if (!spreadsheetId) {
     throw new Error('ID da planilha cliente não informado.');
@@ -13,7 +19,7 @@ function cliente_formatarPlanilhaInterface_(spreadsheetId) {
   const ss = SpreadsheetApp.openById(spreadsheetId);
   const props = PropertiesService.getDocumentProperties();
 
-  if (props.getProperty('CLIENTE_FORMATADO') === 'true') {
+  if (!forcar && props.getProperty('CLIENTE_FORMATADO') === 'true') {
     return;
   }
 

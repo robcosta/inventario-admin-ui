@@ -1,8 +1,7 @@
-/**
- * ============================================================
- * UI ADMIN — PLANILHA CLIENTE
- * ============================================================
- */
+// ============================================================
+// UI ADMIN — PLANILHA CLIENTE
+// ============================================================
+
 function ui_admin_formatarPlanilhaCliente() {
 
   const ui = SpreadsheetApp.getUi();
@@ -14,20 +13,16 @@ function ui_admin_formatarPlanilhaCliente() {
   }
 
   const resp = ui.alert(
-    'Formatar Planilha Cliente',
-    'Isso irá aplicar o layout padrão da planilha cliente.\n\n' +
+    'Reformatar Planilha Cliente',
+    'Isso irá REAPLICAR o layout padrão da planilha cliente,\n' +
+    'independentemente do estado atual.\n\n' +
     'Deseja continuar?',
     ui.ButtonSet.YES_NO
   );
 
   if (resp !== ui.Button.YES) return;
 
-  try {
-    cliente_formatarPlanilhaInterface_(contexto.planilhaClienteId);
-    ui.alert('Planilha cliente formatada com sucesso.');
-  } catch (e) {
-    Logger.log('[ADMIN][FORMATAR_CLIENTE][ERRO]');
-    Logger.log(e);
-    ui.alert('Erro ao formatar planilha cliente:\n\n' + e.message);
-  }
+  cliente_reformatarPlanilhaInterface_(contexto.planilhaClienteId);
+
+  ui.alert('Planilha cliente reformatada com sucesso.');
 }
