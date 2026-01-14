@@ -81,7 +81,8 @@ function criarMenuAdminOperacional_() {
     .addSeparator()
     .addItem('🎨 Formatar Planilha Cliente', 'ui_admin_formatarPlanilhaCliente')
 
-    .addItem("📥 Importar CSVs do Contexto", "ui_admin_importarCSVs")
+    .addItem('📤 Enviar CSV do Computador', 'ui_admin_uploadCSV')
+
     .addItem(
       "📊 Popular Planilha Operacional",
       "ui_admin_popularPlanilhaOperacional"
