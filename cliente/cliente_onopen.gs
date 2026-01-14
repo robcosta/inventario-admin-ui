@@ -13,7 +13,7 @@ function onOpen_(e) {
     if (!raw) return;
 
     const contexto = JSON.parse(raw);
-    cliente_atualizarInformacoes_(contexto);
+    cliente_montarInformacoes_(contexto);
 
   } catch (err) {
     Logger.log('[CLIENTE][ONOPEN][ERRO]');

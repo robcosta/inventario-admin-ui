@@ -1,28 +1,30 @@
-// ============================================================
-// UI ADMIN — PLANILHA CLIENTE
-// ============================================================
-
 function ui_admin_formatarPlanilhaCliente() {
 
-  const ui = SpreadsheetApp.getUi();
-  const contexto = admin_obterContextoAtivo_();
+  Logger.log('[ADMIN][FORMATAR_CLIENTE] Início');
 
-  if (!contexto || !contexto.planilhaClienteId) {
-    ui.alert('Planilha cliente não encontrada no contexto ativo.');
+  const ui = SpreadsheetApp.getUi();
+  const contextoCliente = admin_obterContextoAtivo_();
+
+  if (!contextoCliente || !contextoCliente.planilhaClienteId) {
+    ui.alert('Planilha cliente não encontrada no contextoCliente ativo.');
     return;
   }
 
   const resp = ui.alert(
-    'Reformatar Planilha Cliente',
-    'Isso irá REAPLICAR o layout padrão da planilha cliente,\n' +
-    'independentemente do estado atual.\n\n' +
-    'Deseja continuar?',
+    'Formatar Planilha Cliente',
+    'Deseja formatar e atualizar a planilha cliente?',
     ui.ButtonSet.YES_NO
   );
 
   if (resp !== ui.Button.YES) return;
 
-  cliente_reformatarPlanilhaInterface_(contexto.planilhaClienteId);
+  cliente_formatarPlanilhaInterface_(
+    contextoCliente.planilhaClienteId,
+    contextoCliente
+  );
 
-  ui.alert('Planilha cliente reformatada com sucesso.');
+  cliente_montarInformacoes_(contextoCliente);
+  ui.alert('Planilha cliente formatada e atualizada com sucesso.');
+
+  Logger.log('[ADMIN][FORMATAR_CLIENTE] Finalizado');
 }

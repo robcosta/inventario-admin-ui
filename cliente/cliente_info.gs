@@ -1,36 +1,79 @@
 /**
  * ============================================================
- * ATUALIZA INFORMAÇÕES DINÂMICAS DA PLANILHA CLIENTE
+ * MONTA INFORMAÇÕES DINÂMICAS DA PLANILHA CLIENTE
  * ============================================================
  */
-function cliente_atualizarInformacoes_(contexto) {
-
+function cliente_montarInformacoes_(contexto) {
   if (!contexto) return;
 
   const ss = SpreadsheetApp.getActive();
   const sheet = ss.getSheetByName('INFORMAÇÕES');
   if (!sheet) return;
 
-  sheet.getRange('B3').setValue(contexto.nome);
+  // ============================================================
+  // CONTEXTO / NOME
+  // ============================================================
+  sheet.getRange('E8').setValue(contexto.nome || '');
 
-  const pasta = DriveApp.getFolderById(contexto.pastaUnidadeId);
-  sheet.getRange('B6').setValue(pasta.getUrl());
+  // ============================================================
+  // PASTA DE TRABALHO (LINK)
+  // ============================================================
+  if (contexto.pastaUnidadeId) {
+    const pasta = DriveApp.getFolderById(contexto.pastaUnidadeId);
+    sheet.getRange('E9')
+      .setValue(pasta.getUrl())
+      .setFontColor('#1a73e8')
+      .setFontWeight('normal');
+  }
 
-  const editores = pasta.getEditors().map(u => u.getEmail());
-  const adminEmail = contexto.emailAdmin || '';
+  // ============================================================
+  // LIMPA ÁREA DINÂMICA (COLUNA E A PARTIR DA LINHA 10)
+  // ============================================================
+  sheet.getRange('E10:E50').clearContent();
 
-  sheet.getRange('A10:B30').clearContent();
+  let linhaAtual = 10;
 
-  let linha = 10;
-  sheet.getRange(`A${linha}`).setValue('Admin:');
-  sheet.getRange(`B${linha}`).setValue(adminEmail).setFontWeight('bold');
-  linha++;
+  // ============================================================
+  // ADMINISTRADORES
+  // ============================================================
+  const admins = Array.isArray(contexto.admins)
+    ? contexto.admins
+    : (contexto.emailAdmin ? [contexto.emailAdmin] : []);
 
-  sheet.getRange(`A${linha}`).setValue('Usuários com acesso:');
-  linha++;
+  admins.forEach(email => {
+    sheet.getRange(`E${linhaAtual}`)
+      .setValue(email)
+      .setFontWeight('bold');
+    linhaAtual++;
+  });
+
+  // ============================================================
+  // EDITORES (DA PASTA)
+  // ============================================================
+  let editores = [];
+  if (contexto.pastaUnidadeId) {
+    const pasta = DriveApp.getFolderById(contexto.pastaUnidadeId);
+    editores = pasta.getEditors().map(u => u.getEmail());
+  }
 
   editores.forEach(email => {
-    sheet.getRange(`B${linha}`).setValue(email);
-    linha++;
+    sheet.getRange(`E${linhaAtual}`)
+      .setValue(email)
+      .setFontWeight('normal');
+    linhaAtual++;
+  });
+
+  // ============================================================
+  // LEITORES (SE EXISTIR NO CONTEXTO)
+  // ============================================================
+  const leitores = Array.isArray(contexto.leitores)
+    ? contexto.leitores
+    : [];
+
+  leitores.forEach(email => {
+    sheet.getRange(`E${linhaAtual}`)
+      .setValue(email)
+      .setFontStyle('italic');
+    linhaAtual++;
   });
 }

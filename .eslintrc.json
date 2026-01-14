@@ -1,0 +1,37 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "extends": [
+    "google"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "script"
+  },
+  "rules": {
+    "no-redeclare": "error",
+    "no-dupe-func": "error",
+    "no-dupe-keys": "error",
+    "no-unused-vars": ["warn"],
+    "no-var": "off",
+    "require-jsdoc": "off",
+    "valid-jsdoc": "off"
+  },
+  "globals": {
+    "SpreadsheetApp": "readonly",
+    "DriveApp": "readonly",
+    "DocumentApp": "readonly",
+    "FormApp": "readonly",
+    "GmailApp": "readonly",
+    "Logger": "readonly",
+    "Utilities": "readonly",
+    "Session": "readonly",
+    "HtmlService": "readonly",
+    "LockService": "readonly",
+    "PropertiesService": "readonly",
+    "CacheService": "readonly",
+    "ScriptApp": "readonly"
+  }
+}

@@ -73,9 +73,12 @@ function ui_admin_criarContextoTrabalho() {
   const pastaUnidades = obterOuCriarSubpasta_(raiz, 'UNIDADES');
   const pastaUnidade = obterOuCriarSubpasta_(pastaUnidades, nomeContexto);
 
+  ui.alert('Estrutura de pastas criada com sucesso.');
+
   // 4️⃣ Criar Planilha Cliente
   const planilhaCliente = SpreadsheetApp.create('UI ' + nomeUsuario);
   DriveApp.getFileById(planilhaCliente.getId()).moveTo(pastaUnidade);
+  ui.alert('Planilha do usuário criada com sucesso.');
 
   // 5️⃣ Criar objeto de contexto do CLIENTE
   const contextoCliente = {
@@ -93,8 +96,17 @@ function ui_admin_criarContextoTrabalho() {
   );
 
   // 7️⃣ Formatar e atualizar planilha cliente
-  cliente_formatarPlanilhaInterface_(planilhaCliente.getId());
-  cliente_atualizarInformacoes_(contextoCliente);
+  //cliente_formatarPlanilhaInterface_(planilhaCliente.getId());
+  //cliente_atualizarInformacoes_(planilhaCliente.getId(), contextoCliente);
+  cliente_formatarPlanilhaInterface_(
+  contextoCliente.planilhaClienteId,
+  contextoCliente
+);
+
+cliente_montarInformacoes_(contextoCliente);
+
+  ui.alert('Planilha cliente formatada e atualizada com sucesso.');
+
 
   // 8️⃣ Planilha operacional (ADMIN)
   const planilhaOperacional = SpreadsheetApp.getActiveSpreadsheet();
